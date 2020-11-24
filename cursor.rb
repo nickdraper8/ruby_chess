@@ -32,10 +32,12 @@ MOVES = {
 
 class Cursor
 
-  attr_reader :cursor_pos, :board, :selected
+  attr_reader :cursor_pos, :board, :selected, :last_selected
 
   def initialize(cursor_pos, board)
     @cursor_pos = cursor_pos
+    @first_selected = nil
+    @second_selected = nil
     @selected = false
     @board = board
   end
@@ -46,7 +48,11 @@ class Cursor
   end
 
   def toggle_selected
-    @selected ? @selected = false : @selected = true
+    if @selected
+      @selected = false
+    else
+      @selected = true
+    end
   end
 
   private
@@ -83,8 +89,13 @@ class Cursor
   def handle_key(key)
     case key
     when :return, :space
-        self.toggle_selected
-        @cursor_pos
+      debugger
+        unless @board[@cursor_pos].class.name == "NullPiece" && !self.selected
+          self.toggle_selected
+          @last_selected = @cursor_pos
+          @cursor_pos
+        end
+        
     when :left, :right, :up, :down
         new_pos = update_pos(MOVES[key])
         @cursor_pos = new_pos if new_pos
